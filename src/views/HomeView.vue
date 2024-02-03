@@ -1,18 +1,19 @@
 <script lang="ts" setup>
 import buttonComponent from '@/components/ui/molecules/buttonComponent.vue'
-
-// import { render } from '@/components/ui/molecules/buttonComponent'
 </script>
 
 <template>
-  <div class="grid place-items-center min-h-svh">
-    <!-- <render /> -->
+  <div class="flex flex-col text-center justify-center gap-y-8 min-h-svh">
+    <h1 class="text-lg">
+      Welcome to dashboard!
+    </h1>
+
     <buttonComponent
       el-type="btn"
-      to="/about"
-      class="btn-primary"
+      class="btn-primary w-fit mx-auto"
+      to="/daftar-piutang-unit"
     >
-      test
+      <span>click here to see all data</span>
     </buttonComponent>
   </div>
 </template>
