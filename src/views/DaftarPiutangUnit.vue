@@ -34,6 +34,10 @@ ds.$subscribe((_, state) => {
   dataTable.value = state.data
 })
 
+/**
+ * Function for sorting the data based on a specified column.
+ * @param {string} column - The column by which the data should be sorted.
+ */
 function sortColumn(column: any) {
   if (sortingColumn.value === column) {
     sortingOrder.value = sortingOrder.value === 'asc' ? 'desc' : 'asc'
@@ -50,6 +54,12 @@ function sortColumn(column: any) {
     dataTable.value = orderBy(dataTable.value, [column], [sortingOrder.value])
 }
 
+/**
+ * Custom comparator function for sorting 'hargaTerbentuk' column.
+ * @param {any} a - First item to compare.
+ * @param {any} b - Second item to compare.
+ * @returns {number} - Result of comparison.
+ */
 function customHargaTerbentukComparator(a: any, b: any): number {
   const aValue = parseNumber(a.hargaTerbentuk)
   const bValue = parseNumber(b.hargaTerbentuk)
@@ -57,6 +67,11 @@ function customHargaTerbentukComparator(a: any, b: any): number {
   return sortingOrder.value === 'asc' ? aValue - bValue : bValue - aValue
 }
 
+/**
+ * Function for parsing a string to a number by removing non-numeric characters.
+ * @param {string} value - The string to be parsed.
+ * @returns {number} - The parsed number.
+ */
 function parseNumber(value: string) {
   return Number.parseFloat(value.replace(/./g, ''))
 }
@@ -64,6 +79,10 @@ function parseNumber(value: string) {
 function checkInput(row: object) {
   inputRow.value = row
 }
+
+/**
+ * Function for updating the status of a row to 'Lunas'.
+ */
 function pay() {
   const arr = data.value
   for (let index = 0; index < arr.length; index++) {

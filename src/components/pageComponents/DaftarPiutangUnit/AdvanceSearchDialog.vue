@@ -12,9 +12,17 @@ const dataSource = useDataSource()
 const dataValue = ref(dataSource.data)
 const statusOptions = ['Proses pembayaran', 'Lunas', 'Konfirmasi pembayaran', 'Batal']
 
+/**
+ * Controller for handling dialog interactions.
+ * @type {DialogController}
+ */
 const dialog = new DialogController()
 const router = useRouter()
 
+/**
+ * Computed property for calculating the minimum value of 'hargaTerbentuk' in the data.
+ * @type {ComputedRef<number>}
+ */
 const minVal = computed(() => {
   let value = 0
   const compareVal: number[] = []
@@ -25,12 +33,23 @@ const minVal = computed(() => {
 
   return value
 })
+
+/**
+ * @typedef {object} SearchParams
+ * @property {number} price - The price parameter for filtering.
+ * @property {string | null} date - The date parameter for filtering.
+ * @property {string[]} status - The status parameter for filtering.
+ */
 const searchParams = ref({
   price: 0,
   date: null as string | null,
   status: [] as string[],
 })
 
+/**
+ * Computed property for calculating the maximum value of 'hargaTerbentuk' in the data.
+ * @type {ComputedRef<number>}
+ */
 const maxVal = computed(() => {
   let value = 0
   const compareVal: number[] = []
@@ -42,6 +61,10 @@ const maxVal = computed(() => {
   return value
 })
 
+/**
+ * Function to perform a search based on the provided search parameters.
+ * @function
+ */
 function search() {
   dataSource.data = dataValue.value.filter((item) => {
     const priceCondition = Math.abs(item.hargaTerbentuk - searchParams.value.price) <= (maxVal.value - minVal.value) / 2
@@ -68,6 +91,10 @@ function search() {
   dialog.useDialogController({ content: 'advance-search', show: false })
 }
 
+/**
+ * Function to reset search parameters and reload the original data.
+ * @function
+ */
 function reset() {
   router.replace({ name: 'dpu-page' })
   searchParams.value = {
