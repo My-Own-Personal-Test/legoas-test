@@ -3,12 +3,15 @@ import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useDataSource } from '@/stores/dataSource'
 import { formatNumber } from '@/utils/numberFormat'
+import { DialogController } from '@/composables/ui/dialogController'
 import dialogComponent from '@/components/ui/molecules/dialogComponent.vue'
 import buttonComponent from '@/components/ui/atoms/buttonComponent.vue'
 
 const dataSource = useDataSource()
 const dataValue = ref(dataSource.data)
 const statusOptions = ['Proses pembayaran', 'Lunas', 'Konfirmasi pembayaran', 'Batal']
+
+const dialog = new DialogController()
 
 const minVal = computed(() => {
   let value = 0
@@ -21,7 +24,7 @@ const minVal = computed(() => {
   return value
 })
 const searchParams = ref({
-  price: minVal.value as number | null,
+  price: minVal.value as number,
   date: null as string | null,
   status: [] as string[],
 })
@@ -39,7 +42,7 @@ const maxVal = computed(() => {
 
 function search() {
   dataSource.data = dataValue.value.filter((item) => {
-    const priceCondition = searchParams.value.price === null || item.hargaTerbentuk === searchParams.value.price
+    const priceCondition = Math.abs(item.hargaTerbentuk - searchParams.value.price) <= (maxVal.value - minVal.value) / 2
 
     const dateCondition
       = searchParams.value.date === null
@@ -50,6 +53,18 @@ function search() {
 
     return priceCondition && dateCondition && statusCondition
   })
+
+  dialog.useDialogController({ content: 'advance-search', show: false })
+}
+
+function reset() {
+  searchParams.value = {
+    price: minVal.value,
+    date: null,
+    status: [],
+  }
+
+  dataSource.data = dataSource.originalData
 }
 </script>
 
@@ -107,17 +122,31 @@ function search() {
         </label>
       </div>
 
-      <buttonComponent
-        el-type="btn"
-        class="btn-primary btn-sm"
-        @click="search"
-      >
-        <Icon
-          icon="ant-design:search-outlined"
-          class="text-xl"
-        />
-        <span>Search</span>
-      </buttonComponent>
+      <div class="flex w-full justify-center gap-x-4">
+        <buttonComponent
+          el-type="btn"
+          class="btn-primary btn-sm w-1/2"
+          @click="search"
+        >
+          <Icon
+            icon="ant-design:search-outlined"
+            class="text-xl"
+          />
+          <span>Search</span>
+        </buttonComponent>
+
+        <buttonComponent
+          el-type="btn"
+          class="btn-error btn-sm w-1/2"
+          @click="reset"
+        >
+          <Icon
+            icon="ant-design:reload-outlined"
+            class="text-xl"
+          />
+          <span>reset</span>
+        </buttonComponent>
+      </div>
     </div>
   </dialogComponent>
 </template>

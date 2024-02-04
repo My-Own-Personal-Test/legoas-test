@@ -73,7 +73,8 @@ function pay() {
 }
 
 function refresh() {
-  window.location.reload()
+  if (ds.data.length !== ds.originalData.length)
+    ds.data = ds.originalData
 }
 </script>
 
