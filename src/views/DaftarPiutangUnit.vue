@@ -3,8 +3,7 @@ import { computed, onBeforeMount, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { orderBy } from 'lodash'
 import { storeToRefs } from 'pinia'
-
-// import { data } from '@/dataSource'
+import { useRouter } from 'vue-router'
 import { convertDateFromMilli, formatNumber } from '@/utils/numberFormat'
 import { DialogController } from '@/composables/ui/dialogController'
 import { useDataSource } from '@/stores/dataSource'
@@ -21,6 +20,7 @@ const inputRow = ref<Record<string, any>>({})
 const dialog = new DialogController()
 const ds = useDataSource()
 const { data } = storeToRefs(ds)
+const router = useRouter()
 
 const sortedData = computed(() => {
   return orderBy(dataTable.value, [sortingColumn.value], [sortingOrder.value])
@@ -73,6 +73,7 @@ function pay() {
 }
 
 function refresh() {
+  router.replace({ name: 'dpu-page' })
   if (ds.data.length !== ds.originalData.length)
     ds.data = ds.originalData
 }
@@ -108,11 +109,11 @@ function refresh() {
         <buttonComponent
           el-type="btn"
           class="btn-sm btn-info"
+          @click="refresh"
         >
           <Icon
             icon="ant-design:reload-outlined"
             class="text-lg"
-            @click="refresh"
           />
           Refresh
         </buttonComponent>

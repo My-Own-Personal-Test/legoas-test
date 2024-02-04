@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import { type LocationQueryValueRaw, useRouter } from 'vue-router'
 import { useDataSource } from '@/stores/dataSource'
 import { formatNumber } from '@/utils/numberFormat'
 import { DialogController } from '@/composables/ui/dialogController'
@@ -12,6 +13,7 @@ const dataValue = ref(dataSource.data)
 const statusOptions = ['Proses pembayaran', 'Lunas', 'Konfirmasi pembayaran', 'Batal']
 
 const dialog = new DialogController()
+const router = useRouter()
 
 const minVal = computed(() => {
   let value = 0
@@ -24,7 +26,7 @@ const minVal = computed(() => {
   return value
 })
 const searchParams = ref({
-  price: minVal.value as number,
+  price: 0,
   date: null as string | null,
   status: [] as string[],
 })
@@ -52,6 +54,15 @@ function search() {
       = searchParams.value.status.length === 0 || searchParams.value.status.includes(item.status)
 
     return priceCondition && dateCondition && statusCondition
+  })
+
+  router.replace({
+    name: 'dpu-page',
+    query: {
+      price: searchParams.value.price ?? searchParams.value.price,
+      date: searchParams.value.date ?? searchParams.value.date,
+      status: searchParams.value.status ?? searchParams.value.status,
+    },
   })
 
   dialog.useDialogController({ content: 'advance-search', show: false })
