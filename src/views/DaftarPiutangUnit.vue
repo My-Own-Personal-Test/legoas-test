@@ -321,6 +321,29 @@ function refresh() {
         </tbody>
       </table>
     </div>
+
+    <div class="flex w-full items-center p-6 gap-x-8">
+      <div class="w-full flex justify-end items-center gap-x-4">
+        <span>Tampilkan</span>
+        <select class="select select-bordered select-sm max-w-xs">
+          <option>
+            10
+          </option>
+          <option>25</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-x-4">
+        <span>Page</span>
+        <div class="join">
+          <button class="join-item btn btn-active">
+            1
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
   <AdvanceSearchDialog />
 </template>
