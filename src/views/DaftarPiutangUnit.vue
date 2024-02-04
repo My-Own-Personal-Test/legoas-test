@@ -2,9 +2,12 @@
 import { computed, onBeforeMount, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { orderBy } from 'lodash'
-import { data } from '@/dataSource'
+import { storeToRefs } from 'pinia'
+
+// import { data } from '@/dataSource'
 import { convertDateFromMilli, formatNumber } from '@/utils/numberFormat'
 import { DialogController } from '@/composables/ui/dialogController'
+import { useDataSource } from '@/stores/dataSource'
 import buttonComponent from '@/components/ui/atoms/buttonComponent.vue'
 import AdvanceSearchDialog from '@/components/pageComponents/DaftarPiutangUnit/AdvanceSearchDialog.vue'
 
@@ -16,6 +19,8 @@ const sortingOrder = ref<'asc' | 'desc'>('asc')
 const inputRow = ref<Record<string, any>>({})
 
 const dialog = new DialogController()
+const ds = useDataSource()
+const { data } = storeToRefs(ds)
 
 const sortedData = computed(() => {
   return orderBy(dataTable.value, [sortingColumn.value], [sortingOrder.value])
@@ -23,6 +28,10 @@ const sortedData = computed(() => {
 
 onBeforeMount(() => {
   dataTable.value = data.value satisfies Table
+})
+
+ds.$subscribe((_, state) => {
+  dataTable.value = state.data
 })
 
 function sortColumn(column: any) {
@@ -62,6 +71,10 @@ function pay() {
       arr[index].status = 'Lunas'
   }
 }
+
+function refresh() {
+  window.location.reload()
+}
 </script>
 
 <template>
@@ -98,6 +111,7 @@ function pay() {
           <Icon
             icon="ant-design:reload-outlined"
             class="text-lg"
+            @click="refresh"
           />
           Refresh
         </buttonComponent>

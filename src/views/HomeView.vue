@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import buttonComponent from '@/components/ui/molecules/buttonComponent.vue'
+import buttonComponent from '@/components/ui/atoms/buttonComponent.vue'
 </script>
 
 <template>
