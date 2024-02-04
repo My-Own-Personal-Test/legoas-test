@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { computed, onBeforeMount, onUpdated, ref } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { orderBy } from 'lodash'
 import { data } from '@/dataSource'
 import { convertDateFromMilli, formatNumber } from '@/utils/numberFormat'
-import buttonComponent from '@/components/ui/molecules/buttonComponent.vue'
+import { DialogController } from '@/composables/ui/dialogController'
+import buttonComponent from '@/components/ui/atoms/buttonComponent.vue'
+import AdvanceSearchDialog from '@/components/pageComponents/DaftarPiutangUnit/AdvanceSearchDialog.vue'
 
 type Table = Record<string, any>
 
@@ -13,6 +15,8 @@ const sortingColumn = ref<string>('')
 const sortingOrder = ref<'asc' | 'desc'>('asc')
 const inputRow = ref<Record<string, any>>({})
 
+const dialog = new DialogController()
+
 const sortedData = computed(() => {
   return orderBy(dataTable.value, [sortingColumn.value], [sortingOrder.value])
 })
@@ -20,27 +24,6 @@ const sortedData = computed(() => {
 onBeforeMount(() => {
   dataTable.value = data.value satisfies Table
 })
-
-onUpdated(() => {
-  convertDate()
-  convertPrice()
-})
-
-function convertDate() {
-  for (const item of dataTable.value) {
-    item.tgglJatuhTempo = convertDateFromMilli(item.tgglJatuhTempo) as any
-    item.tgglLelang = convertDateFromMilli(item.tgglLelang) as any
-    item.tgglLunas = item.tgglLunas ? convertDateFromMilli(item.tgglLunas as any) : ''
-  }
-}
-
-function convertPrice() {
-  for (const item of dataTable.value) {
-    item.biayaAdmin = formatNumber(item.biayaAdmin) as any
-    item.hargaTerbentuk = formatNumber(item.hargaTerbentuk) as any
-    item.total = formatNumber(item.total) as any
-  }
-}
 
 function sortColumn(column: any) {
   if (sortingColumn.value === column) {
@@ -83,14 +66,42 @@ function pay() {
 
 <template>
   <section class="p-4">
-    <div class="py-4">
+    <div class="py-4 w-full flex justify-between">
       <buttonComponent
         class="btn-success btn-sm"
         el-type="btn"
         @click="pay"
       >
+        <Icon
+          icon="ant-design:dollar-circle-filled"
+          class="text-lg"
+        />
         Bayar
       </buttonComponent>
+
+      <div class="flex gap-x-4">
+        <buttonComponent
+          el-type="btn"
+          class="btn-sm btn-primary"
+          @click="dialog.useDialogController({ content: 'advance-search', show: true })"
+        >
+          <Icon
+            icon="ant-design:search-outlined"
+            class="text-lg"
+          />
+          Advance Search
+        </buttonComponent>
+        <buttonComponent
+          el-type="btn"
+          class="btn-sm btn-info"
+        >
+          <Icon
+            icon="ant-design:reload-outlined"
+            class="text-lg"
+          />
+          Refresh
+        </buttonComponent>
+      </div>
     </div>
     <div class="overflow-x-auto w-full">
       <table
@@ -203,21 +214,30 @@ function pay() {
                 class="text-lg"
               />
             </th>
-            <th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('tgglJatuhTempo')"
+            >
               Tanggal Jatuh Tempo
               <Icon
                 icon="ant-design:sort-ascending-outlined"
                 class="text-lg"
               />
             </th>
-            <th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('tgglLunas')"
+            >
               Tanggal Lunas
               <Icon
                 icon="ant-design:sort-ascending-outlined"
                 class="text-lg"
               />
             </th>
-            <th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('status')"
+            >
               Status
               <Icon
                 icon="ant-design:sort-ascending-outlined"
@@ -243,15 +263,49 @@ function pay() {
                 >
               </label>
             </th>
-            <td
-              v-for="itemData of item"
-              :key="itemData.id"
-            >
-              {{ itemData }}
+            <td>
+              {{ item.noKewajiban }}
+            </td>
+            <td>
+              {{ item.noPolisi }}
+            </td>
+            <td>
+              {{ item.pemilik }}
+            </td>
+            <td>
+              {{ item.peserta }}
+            </td>
+            <td>
+              {{ item.noVA }}
+            </td>
+            <td>
+              {{ formatNumber(item.hargaTerbentuk) }}
+            </td>
+            <td>
+              {{ formatNumber(item.biayaAdmin) }}
+            </td>
+            <td>
+              {{ formatNumber(item.ppn) }}
+            </td>
+            <td>
+              {{ formatNumber(item.total) }}
+            </td>
+            <td>
+              {{ convertDateFromMilli(item.tgglLelang) }}
+            </td>
+            <td>
+              {{ convertDateFromMilli(item.tgglJatuhTempo) }}
+            </td>
+            <td>
+              {{ convertDateFromMilli(item.tgglLunas) }}
+            </td>
+            <td>
+              {{ item.status }}
             </td>
           </tr>
         </tbody>
       </table>
     </div>
   </section>
+  <AdvanceSearchDialog />
 </template>
