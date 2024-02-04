@@ -69,6 +69,7 @@ function search() {
 }
 
 function reset() {
+  router.replace({ name: 'dpu-page' })
   searchParams.value = {
     price: minVal.value,
     date: null,
