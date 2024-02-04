@@ -1,4 +1,6 @@
-export const data = [
+import { ref } from 'vue'
+
+export const data = ref([
   {
     noKewajiban: 'B20116005069',
     noPolisi: 'KT 3090 BJS',
@@ -44,4 +46,4 @@ export const data = [
     tgglLunas: '',
     status: 'Proses pembayaran',
   },
-]
+])
