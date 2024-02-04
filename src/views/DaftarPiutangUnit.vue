@@ -1,15 +1,22 @@
 <script lang="ts" setup>
-import { onBeforeMount, onMounted, ref } from 'vue'
+import { computed, onBeforeMount, onMounted, ref } from 'vue'
+import { Icon } from '@iconify/vue'
+import { orderBy } from 'lodash'
 import { data } from '@/dataSource'
-import { convertMillisecondsToDateFormat, formatNumber } from '@/utils/numberFormat'
+import { convertDateFromMilli, formatNumber } from '@/utils/numberFormat'
 
 type Table = Record<string, any>
 
 const dataTable = ref<Table[]>([])
+const sortingColumn = ref<string>('')
+const sortingOrder = ref<'asc' | 'desc'>('asc')
 
 onBeforeMount(() => {
   convertDate()
   convertPrice()
+})
+const sortedData = computed(() => {
+  return orderBy(dataTable.value, [sortingColumn.value], [sortingOrder.value])
 })
 
 onMounted(() => {
@@ -18,9 +25,9 @@ onMounted(() => {
 
 function convertDate() {
   for (const item of data) {
-    item.tgglJatuhTempo = convertMillisecondsToDateFormat(item.tgglJatuhTempo) as any
-    item.tgglLelang = convertMillisecondsToDateFormat(item.tgglLelang) as any
-    item.tgglLunas = item.tgglLunas ? convertMillisecondsToDateFormat(item.tgglLunas as any) : ''
+    item.tgglJatuhTempo = convertDateFromMilli(item.tgglJatuhTempo) as any
+    item.tgglLelang = convertDateFromMilli(item.tgglLelang) as any
+    item.tgglLunas = item.tgglLunas ? convertDateFromMilli(item.tgglLunas as any) : ''
   }
 }
 
@@ -31,12 +38,42 @@ function convertPrice() {
     item.total = formatNumber(item.total) as any
   }
 }
+
+function sortColumn(column: any) {
+  if (sortingColumn.value === column) {
+    sortingOrder.value = sortingOrder.value === 'asc' ? 'desc' : 'asc'
+  }
+  else {
+    sortingColumn.value = column
+    sortingOrder.value = 'asc'
+  }
+
+  if (column === 'hargaTerbentuk')
+    dataTable.value = orderBy(dataTable.value, [], [customHargaTerbentukComparator as any])
+
+  else
+    dataTable.value = orderBy(dataTable.value, [column], [sortingOrder.value])
+}
+
+function customHargaTerbentukComparator(a: any, b: any): number {
+  const aValue = parseNumber(a.hargaTerbentuk)
+  const bValue = parseNumber(b.hargaTerbentuk)
+
+  return sortingOrder.value === 'asc' ? aValue - bValue : bValue - aValue
+}
+
+function parseNumber(value: string) {
+  return Number.parseFloat(value.replace(/./g, ''))
+}
 </script>
 
 <template>
-  <section class="container py-4">
-    <div class="overflow-x-auto w-full ">
-      <table class="table">
+  <section class="p-4">
+    <div class="overflow-x-auto w-full">
+      <table
+        id="idTable"
+        class="table table-xs w-[110svw]"
+      >
         <!-- head -->
         <thead>
           <tr>
@@ -48,26 +85,129 @@ function convertPrice() {
                 >
               </label>
             </th>
-            <th>No. Kewajiban</th>
-            <th>No. Polisi</th>
-            <th>Pemilik</th>
-            <th>Peserta</th>
-            <th>Nomor VA</th>
-            <th>Harga Terbentuk (Rp)</th>
-            <th>Biaya Admin ex PPN (Rp)</th>
-            <th>PPN (Rp)</th>
-            <th>Total (Rp)</th>
-            <th>Tanggal Lelang</th>
-            <th>Tanggal Jatuh Tempo</th>
-            <th>Tanggal Lunas</th>
-            <th>Status</th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('noKewajiban')"
+            >
+              No. Kewajiban
+              <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('noPolisi')"
+            >
+              No. Polisi
+              <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('pemilik')"
+            >
+              Pemilik
+              <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('peserta')"
+            >
+              Peserta <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('noVA')"
+            >
+              Nomor VA <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('hargaTerbentuk')"
+            >
+              Harga Terbentuk (Rp) <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('biayaAdmin')"
+            >
+              Biaya Admin ex PPN (Rp) <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('ppn')"
+            >
+              PPN (Rp) <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('total')"
+            >
+              Total (Rp)
+              <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th
+              class="hover:cursor-pointer"
+              @click="sortColumn('tgglLelang')"
+            >
+              Tanggal Lelang
+              <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th>
+              Tanggal Jatuh Tempo
+              <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th>
+              Tanggal Lunas
+              <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
+            <th>
+              Status
+              <Icon
+                icon="ant-design:sort-ascending-outlined"
+                class="text-lg"
+              />
+            </th>
             <th />
           </tr>
         </thead>
         <tbody>
           <!-- row 1 -->
           <tr
-            v-for="(item, index) in dataTable"
+            v-for="(item, index) in sortedData"
             :key="index"
           >
             <th>

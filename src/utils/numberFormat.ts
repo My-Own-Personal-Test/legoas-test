@@ -16,7 +16,7 @@ const { format: formatDate } = Intl.DateTimeFormat('en-GB', {
   year: 'numeric',
 })
 
-export function convertMillisecondsToDateFormat(milliseconds: number): string {
+export function convertDateFromMilli(milliseconds: number): string {
   const date = new Date(milliseconds)
 
   return formatDate(date)
