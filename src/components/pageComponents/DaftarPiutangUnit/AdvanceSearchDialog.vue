@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
-import { type LocationQueryValueRaw, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useDataSource } from '@/stores/dataSource'
 import { formatNumber } from '@/utils/numberFormat'
 import { DialogController } from '@/composables/ui/dialogController'
